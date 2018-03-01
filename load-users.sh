@@ -1,16 +1,4 @@
 #!/bin/bash
-# Requires a DOMAIN, CSV file, and TARGET
-# if [ $# -eq 0 ]
-# then
-#     echo "Must provide a CSV filename formatted as follows:"
-#     echo "username,password"
-#     exit 0
-# fi
-# Create one account for each line in the CSV file
-#while IFS=',' read -r username password
-#do
-#    create_account $username $password
-#done < $1
 
 USERPREFIX=user
 USERPASS=loadgen
