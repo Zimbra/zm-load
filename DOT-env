@@ -1,0 +1,4 @@
+TARGET_HOST=zimbra.zcs-foss.test
+TARGET_PORT=143
+DOMAIN=load.zmc.com
+TEST_NAME=imap                            #test suite to execute
