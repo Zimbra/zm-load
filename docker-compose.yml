@@ -5,3 +5,20 @@ services:
     entrypoint:
       - /entrypoint
     build: .
+    environment:
+      ADMIN_PORT: "9071"
+      HTTPS_PORT: "443"
+      SOAPSERVICE_PORT: "8443"
+      ADMIN: admin
+      ADMIN_PASS: test123
+
+      TARGET: zmc-proxy
+      PORT: 143
+      DOMAIN: load.zmc.com
+      PROTOCOL: IMAP
+      NUMUSERS: 1
+      LOOPCOUNT: 1
+      USERDURATION: 300
+      COMMANDS: 10
+      RAMPUP: 0
+      DURATION: ''
