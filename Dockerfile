@@ -27,13 +27,13 @@ ENV PATH $PATH:$JMETER_BIN
 # for the Jmeter JMX and various property files governing it's execution.
 COPY entrypoint /
 RUN chmod +x /entrypoint
-RUN mkdir -p /opt/load
+RUN mkdir -p /opt/load/tests
 COPY load-users.sh /opt/load
 RUN chmod +x /opt/load/load-users.sh
 
 # Copy all of the load tests
-ADD load /opt/load
+ADD load /opt/load/tests
 
-WORKDIR	${JMETER_HOME}
+WORKDIR	/opt/load
 
 ENTRYPOINT ["/entrypoint"]
