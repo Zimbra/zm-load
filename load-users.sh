@@ -83,31 +83,6 @@ EOF
     cat response.txt
 }
 
-create_multiple_account()
-{
-    cat > payload.txt <<EOF
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
-  <soap:Header>
-    <context xmlns="urn:zimbra">
-      <authToken>$AUTHTOKEN</authToken>
-    </context>
-  </soap:Header>
-  <soap:Body>
-EOF
-    for i in `seq 1 10`;
-    do
-        echo "    <CreateAccountRequest xmlns=\"urn:zimbraAdmin\" name=\"$1$i@$DOMAIN\" password=\"$2\"></CreateAccountRequest>" >> payload.txt
-    done
-    cat >> payload.txt <<EOF
-  </soap:Body>
-</soap:Envelope>
-EOF
-
-    curl -k -X POST -H 'Content-Type:application/soap+xml' https://$TARGET:$ADMIN_PORT/service/admin/soap --data-binary @payload.txt > response.txt
-    #cat payload.txt
-    cat response.txt
-}
-
 create_accounts() {
     # Creates a CSV file for usage by Jmeter & creates accounts on target server in the $DOMAIN
     for i in `seq 1 $1`;
