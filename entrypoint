@@ -1,0 +1,40 @@
+#!/bin/bash
+set -euo pipefail
+
+# jmeter -n -Juser.classpath=../src/zjmeter.jar -q imap.prop -q imap/load/t-1u-10000i.prop -q imap/profile/sendmesg-seq.prop -t imap.jmx -e -l imap.log -o results
+
+jmeter_cmd() {
+    echo "jmeter -n -Juser.classpath=/opt/load/src/zjmeter.jar -q target.prop -q load.prop -q cmd_sequence.prop -t $1 -e -l $2 -o results"
+}
+
+generate_target_prop () {
+    # Generates a property file to be processed by Jmeter containing the target system
+    # Arguments: $1 = IMAP / POP / SOAP
+    #            $2 = hostname / ip address
+    #            $3 = port number  - must be appropriate for service specified in $1
+    cat > target.prop <<EOF
+    $1.server=$2
+    $1.port=$3
+    EOF
+}
+
+generate_props() {
+    generate_target_prop "IMAP" $TARGET $PORT
+}
+
+generate_props
+# TODO:
+#
+
+TEST="imap"
+
+if [ $# -eq 0 ]
+   then
+        CMD="jmeter -t /load/$TEST/$TEST.jmx"
+   else
+        CMD="jmeter -t /load/$1/$1.jmx"
+fi
+
+echo $CMD
+
+tail -f /dev/null
