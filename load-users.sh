@@ -30,11 +30,6 @@ EOF
 AUTHTOKEN=$(fetch_authtoken)
 echo "Auth Token: ${AUTHTOKEN}"
 
-build_createaccount()
-{
-    echo '<CreateAccountRequest xmlns="urn:zimbraAdmin" name="$1@$DOMAIN" password="$2"></CreateAccountRequest>'
-}
-
 create_account()
 {
     cat > payload.txt <<EOF
@@ -50,7 +45,7 @@ create_account()
 </soap:Envelope>
 EOF
     curl -k -X POST -H 'Content-Type:application/soap+xml' https://$TARGET:$ADMIN_PORT/service/admin/soap --data-binary @payload.txt > response.txt
-    cat response.txt
+    rm response.txt payload.txt
 }
 
 create_domain()
@@ -68,7 +63,7 @@ create_domain()
 </soap:Envelope>
 EOF
     curl -k -X POST -H 'Content-Type:application/soap+xml' https://$TARGET:$ADMIN_PORT/service/admin/soap --data-binary @payload.txt > response.txt
-    cat response.txt
+    rm response.txt payload.txt
 }
 
 create_accounts() {
