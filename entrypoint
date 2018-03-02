@@ -1,10 +1,21 @@
 #!/bin/bash
 set -euo pipefail
 
+DATE=`date '+%Y%m%d-%H%M'`
+
+DEFAULTPROTOCOL=IMAP
+
+if [ -z "$PROTOCOL" ];
+then
+    echo "WARNING: $PROTOCOL is not set in the environment. Defaulting to $DEFAULTPROTOCOL."
+    PROTOCOL=$DEFAULTPROTOCOL
+fi
+
+
 # jmeter -n -Juser.classpath=../src/zjmeter.jar -q imap.prop -q imap/load/t-1u-10000i.prop -q imap/profile/sendmesg-seq.prop -t imap.jmx -e -l imap.log -o results
 
 jmeter_cmd() {
-    echo "jmeter -n -Juser.classpath=/opt/load/src/zjmeter.jar -q target.prop -q load.prop -q cmd_sequence.prop -t $1 -e -l $2 -o results"
+    echo "jmeter -n -Juser.classpath=/opt/load/tests/src/zjmeter.jar -q target.prop -q load.prop -q commands.prop -t /opt/load/tests/$JMX -e -l loadgen.log -o $RESULTS/$DATE"
 }
 
 generate_target_prop () {
@@ -13,28 +24,72 @@ generate_target_prop () {
     #            $2 = hostname / ip address
     #            $3 = port number  - must be appropriate for service specified in $1
     cat > target.prop <<EOF
-    $1.server=$2
-    $1.port=$3
-    EOF
+$1.server=$2
+$1.port=$3
+EOF
+}
+
+generate_load_prop() {
+    # Generates a property file to be processed by Jmeter containing load settings
+    # Arguments: $1 = IMAP / POP / SOAP
+    cat > load.prop <<EOF
+LOAD.$1.users=$NUMUSERS
+LOAD.$1.userduration=$USERDURATION
+LOAD.$1.commands=$COMMANDS
+LOAD.$1.rampup=$RAMPUP
+LOAD.$1.loopcount=$LOOPCOUNT
+LOAD.$1.duration=$DURATION
+LOAD.$1.requests=requests.log
+LOAD.ACCOUNTS.csv=users.csv
+EOF
+}
+
+generate_command_sequence() {
+    case $PROTOCOL in
+        IMAP)
+            cat > commands.prop<<EOF
+PROFILE.IMAP.type=sequence
+PROFILE.IMAP.sequence.1=LOGIN
+PROFILE.IMAP.sequence.2=LIST
+PROFILE.IMAP.sequence.3=APPEND
+PROFILE.IMAP.sequence.4=LOGOUT
+EOF
+            ;;
+        POP)
+            cat > commands.prop<<EOF
+PROFILE.POP.type=sequence
+PROFILE.POP.sequence.1=USER
+PROFILE.POP.sequence.2=PASS
+PROFILE.POP.sequence.3=LIST
+PROFILE.POP.sequence.4=QUIT
+EOF
+            ;;
+        SOAP)
+            cat > commands.prop<<EOF
+PROFILE.SOAP.type=sequence
+PROFILE.SOAP.sequence.1=AuthRequest(AUTHTYPE=user)
+PROFILE.SOAP.sequence.4=SendMsgRequest
+PROFILE.SOAP.sequence.3=GetMsgRequest
+PROFILE.SOAP.sequence.2=SearchRequest(SEARCHTYPE=message,SEARCH=test)
+EOF
+            ;;
+    esac
 }
 
 generate_props() {
-    generate_target_prop "IMAP" $TARGET $PORT
+    generate_target_prop $PROTOCOL $TARGET $PORT
+    generate_load_prop $PROTOCOL
+    generate_command_sequence $PROTOCOL
 }
 
 generate_props
-# TODO:
-#
 
-TEST="imap"
+./load-users.sh
 
-if [ $# -eq 0 ]
-   then
-        CMD="jmeter -t /load/$TEST/$TEST.jmx"
-   else
-        CMD="jmeter -t /load/$1/$1.jmx"
-fi
+mkdir -p "$RESULTS/$DATE"
 
-echo $CMD
+CMD=$(jmeter_cmd)
+echo "Executing $CMD"
 
+eval $CMD
 tail -f /dev/null

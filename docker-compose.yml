@@ -5,6 +5,8 @@ services:
     entrypoint:
       - /entrypoint
     build: .
+    volumes:
+      - ./results:/opt/load/results
     environment:
       ADMIN_PORT: "9071"
       HTTPS_PORT: "443"
@@ -22,3 +24,5 @@ services:
       COMMANDS: 10
       RAMPUP: 0
       DURATION: ''
+      JMX: imap/imap.jmx
+      RESULTS: /opt/load/results

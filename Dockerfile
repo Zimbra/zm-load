@@ -28,6 +28,7 @@ ENV PATH $PATH:$JMETER_BIN
 COPY entrypoint /
 RUN chmod +x /entrypoint
 RUN mkdir -p /opt/load/tests
+RUN mkdir -p /opt/load/results
 COPY load-users.sh /opt/load
 RUN chmod +x /opt/load/load-users.sh
 
