@@ -92,4 +92,3 @@ CMD=$(jmeter_cmd)
 echo "Executing $CMD"
 
 eval $CMD
-tail -f /dev/null
