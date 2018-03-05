@@ -75,3 +75,7 @@ At the end of the *docker-compose.yml* file define the *zimbra-ha* network as ex
     networks:
       zimbra-ha:
         external: true
+
+Create a new service out of the _zmc-load_ container within the swarm utilizing the _zimbra-ha_ network:
+
+    docker service create --restart-condition=none --network=zimbra-ha  --env-file DOT-env --mount target=/opt/load/results,source=`pwd`/results,type=bind zmc-load:latest
