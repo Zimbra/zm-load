@@ -3,6 +3,8 @@ load tests found within the
 *ssh://git@stash.corp.synacor.com:7999/prf/zimbra-load-testing.git*
 repository.
 
+Note: This was moved to : https://github.com/Zimbra/zimbra-load-testing
+
 As such it does not utilize the scheduling mechanism that allows the tests to function within the SALT load generation framework.
 
 Each image can be spun up with one or more replicas each executing the specified load test.
