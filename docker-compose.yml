@@ -7,7 +7,26 @@ services:
     build: .
     volumes:
       - ./results:/opt/load/results
+
     environment:
+      ADMIN: admin
+      ADMIN_PASS: test123
+
+      TARGET: zmc-proxy
+      PORT: 993
+      DOMAIN: load.zmc.com
+      PROTOCOL: IMAP
+      NUM_ACCOUNTS: 1000
+      LOOPCOUNT: 5
+      USERDURATION: 300
+      COMMANDS: 100
+      RAMPUP: 0
+      DURATION: ''
+      JMX: imap/imap.jmx
+      RESULTS: /opt/load/results  # Location inside container | Must match 'volumes' setting
+
+
+environment:
       ADMIN_PORT: "9071"
       HTTPS_PORT: "443"
       SOAPSERVICE_PORT: "8443"
@@ -18,7 +37,7 @@ services:
       PORT: 143
       DOMAIN: load.zmc.com
       PROTOCOL: IMAP
-      NUMUSERS: 1
+      NUM_ACCOUNTS: 1
       LOOPCOUNT: 1
       USERDURATION: 300
       COMMANDS: 10

@@ -33,7 +33,7 @@ generate_load_prop() {
     # Generates a property file to be processed by Jmeter containing load settings
     # Arguments: $1 = IMAP / POP / SOAP
     cat > load.prop <<EOF
-LOAD.$1.users=$NUMUSERS
+LOAD.$1.users=$NUM_ACCOUNTS
 LOAD.$1.userduration=$USERDURATION
 LOAD.$1.commands=$COMMANDS
 LOAD.$1.rampup=$RAMPUP

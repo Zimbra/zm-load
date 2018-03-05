@@ -1,4 +1,17 @@
-TARGET_HOST=zimbra.zcs-foss.test
-TARGET_PORT=143
+ADMIN=admin
+ADMIN_PASS=test123
+ADMIN_PORT=9071
+
+TARGET=zmc-proxy
+PORT=993
 DOMAIN=load.zmc.com
-TEST_NAME=imap                            #test suite to execute
+PROTOCOL=IMAP
+NUM_ACCOUNTS=100
+LOOPCOUNT=50                # Controls the number of active clients
+USERDURATION=30
+COMMANDS=100
+RAMPUP=0
+DURATION=''
+JMX=imap/imap.jmx
+# RESULTS Location inside container | Must match 'volumes' setting
+RESULTS=/opt/load/results
