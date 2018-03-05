@@ -1,3 +1,3 @@
 [submodule "load"]
 	path = load
-	url = ssh://git@stash.corp.synacor.com:7999/prf/zimbra-load-testing.git
+	url = git@github.com:Zimbra/zimbra-load-testing.git
