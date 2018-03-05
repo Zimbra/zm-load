@@ -5,12 +5,55 @@ DATE=`date '+%Y%m%d-%H%M'`
 
 DEFAULTPROTOCOL=IMAP
 
+# This is the default path that the tests results will be uploaded to in S3.
+# The final component of the pathname will be auto-generated with a date/time stamp
+# Here is an example of what the entire upload URL (used by s3curl) might look like:
+#   https://s3.amazonaws.com/docker.zimbra.com/tests/zcs-foss-multi/20171008T200524+0000.tar.gz
+# So this is:
+#   https://s3.amazonaws.com/<s3-path>/<generated-archive-name>
+# Note: The upload function will replace the `+` in the name with `%2b` so that the end
+#       result is correct.
+# You can override the default path by specifying an environment variable
+# `S3_PATH`.  It should not contain any leading or trailing slashes.  The part before the first `/`
+# should be the name of the bucket.
+S3_PATH_DEFAULT="docker.zimbra.com/tests/zcs-load"
+s3curl_config_path=/root/.s3curl
+have_s3curl_config=no
+
+if [ -f /run/secrets/dot-s3curl ]; then
+    cp /run/secrets/dot-s3curl ${s3curl_config_path} && chmod 400 ${s3curl_config_path}
+fi
+
+if [ -f ${s3curl_config_path} ]; then
+    have_s3curl_config=yes
+fi
+
 if [ -z "$PROTOCOL" ];
 then
     echo "WARNING: $PROTOCOL is not set in the environment. Defaulting to $DEFAULTPROTOCOL."
     PROTOCOL=$DEFAULTPROTOCOL
 fi
 
+function archive_and_upload_logs {
+    cd /opt/load/results
+    archive="zm-load-$(date +'%Y%m%dT%H%M%S%z').tar.gz"
+    tar cfz "${archive}" $DATE
+    s3_name=$(echo "${archive}" | sed -e 's/+/%2b/')
+    s3_path_prefix="${S3_PATH_DEFAULT}"
+    if [ "${S3_PATH}x" != "x" ]; then
+        s3_path_prefix="${S3_PATH}"
+    fi
+    s3_path="s3.amazonaws.com/${s3_path_prefix}/${s3_name}"
+
+    echo "Attempting to upload ${archive} to ${s3_path}..."
+    /root/s3curl.pl --id=test --acl=public-read --put="${archive}" https://${s3_path}
+    rc=$?
+    if [ ${rc} -eq 0 ]; then
+        echo "Upload completed successfully."
+    else
+        echo "Upload did not complete successfully. Return code=${rc}."
+    fi
+}
 
 # jmeter -n -Juser.classpath=../src/zjmeter.jar -q imap.prop -q imap/load/t-1u-10000i.prop -q imap/profile/sendmesg-seq.prop -t imap.jmx -e -l imap.log -o results
 
@@ -92,3 +135,11 @@ CMD=$(jmeter_cmd)
 echo "Executing $CMD"
 
 eval $CMD
+
+if [ "${upload_logs}" = "yes" ]; then
+    if [ "${have_s3curl_config}" = "yes" ]; then
+        archive_and_upload_logs
+    else
+        echo "Unable to upload log files.  Missing the secret with the s3curl configuration."
+    fi
+fi

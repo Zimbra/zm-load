@@ -35,6 +35,9 @@ RUN chmod +x /opt/load/load-users.sh
 # Copy all of the load tests
 ADD load /opt/load/tests
 
+RUN    curl -o /opt/load/s3curl.pl  https://raw.githubusercontent.com/rtdp/s3curl/master/s3curl.pl && \
+       chmod +x /opt/load/s3curl.pl
+
 WORKDIR	/opt/load
 
 ENTRYPOINT ["/entrypoint"]
