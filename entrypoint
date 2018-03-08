@@ -58,7 +58,7 @@ function archive_and_upload_logs {
 # jmeter -n -Juser.classpath=../src/zjmeter.jar -q imap.prop -q imap/load/t-1u-10000i.prop -q imap/profile/sendmesg-seq.prop -t imap.jmx -e -l imap.log -o results
 
 jmeter_cmd() {
-    echo "jmeter -n -Juser.classpath=/opt/load/tests/src/zjmeter.jar -q target.prop -q load.prop -q commands.prop -t /opt/load/tests/$JMX -e -l loadgen.log -o $RESULTS/$DATE"
+    echo "JVM_ARGS=-Xms3g -Xmx3g; jmeter -n -Juser.classpath=/opt/load/tests/src/zjmeter.jar -q target.prop -q load.prop -q commands.prop -t /opt/load/tests/$JMX -e -l loadgen.log -o $RESULTS/$DATE"
 }
 
 generate_target_prop () {
